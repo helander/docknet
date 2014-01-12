@@ -1,0 +1,38 @@
+#!/bin/bash
+
+
+MAPS=`etcdctl ls /dock.net/map`
+for map in $MAPS
+do
+	container=`basename $map`
+	host=`etcdctl get $map/host`
+	echo Container $container at host $host
+	info=($(ip -f inet addr show dev docknet0 |grep inet))
+	addr=$(dirname ${info[1]})
+	if [ $host = $addr ]
+	then
+		echo "   Container $container is for this host ($host)"
+		props=$(etcdctl ls /dock.net/container/$container)
+		for prop in $props
+		do
+			value=$(etcdctl get $prop)
+			#echo "      Property $prop is $value"
+			key=$(basename $prop)
+			case $key in
+			net) NET=$value
+				;;
+			options) OPTIONS=$value
+				;;
+			image) IMAGE=$value
+				;;
+			command) COMMAND=$value
+				;;
+			esac
+		done
+		[ "$(docker inspect $container)" != "[]" ] && docker kill $container && docker rm $container
+		docker run -name="$container" $OPTIONS $IMAGE $COMMAND
+		sudo /opt/bin/pipework docknet0 $container $NET
+	else
+		echo "   Container $container is for another host ($host)"
+	fi
+done

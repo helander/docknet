@@ -1,0 +1,18 @@
+#!/bin/bash
+BRIDGE_DEV=docknet0
+HOST_IP=192.168.1.98/24
+
+info=($(ip -f inet addr show scope global |grep $HOST_IP))
+HOST_DEV=${info[6]}
+
+echo "Create bridge $BRIDGE_DEV with device $HOST_DEV and address $HOST_IP"
+
+default=($(ip route |grep default))
+gateway=${default[2]}
+
+ip link add $BRIDGE_DEV type bridge
+ip link set $BRIDGE_DEV up
+ip link set $HOST_DEV master $BRIDGE_DEV
+ip addr del $HOST_IP dev $HOST_DEV
+ip addr add $HOST_IP dev $BRIDGE_DEV
+ip route add default via $gateway

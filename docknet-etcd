@@ -1,0 +1,4 @@
+#!/bin/bash
+
+systemctl stop etcd.service
+/usr/bin/etcd  -peer-addr 127.0.0.1:7001 -addr 127.0.0.1:4001 -data-dir /var/etcd/main -name serverbox1
