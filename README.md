@@ -1,4 +1,3 @@
-
 # docknet: Distribution system for docker containers
 
 A container distribution system for docker containers (based on docker, etcd and pipework)
@@ -32,4 +31,9 @@ The following software needs to be installed on each host in the `docknet` netwo
 * [`etcd`](https://github.com/coreos/etcd)
 
 * [`pipework`](https://github.com/jpetazzo/pipework)
+
+
+## Create configuration
+
+Currently no tool is available for editing the `etcd` key/value pairs. Use [`etcdctl`](https://github.com/coreos/etcdctl) to create and update your configuration.
 
